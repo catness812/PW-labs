@@ -1,0 +1,200 @@
+#! /usr/bin/env python3
+
+import argparse
+import socket
+import ssl
+import readline
+import urllib.parse
+import json
+from bs4 import BeautifulSoup
+
+
+readline.parse_and_bind('"\e[A": history-search-backward')
+readline.parse_and_bind('"\e[B": history-search-forward')
+
+
+cache = {}
+
+def request(url):
+    if url in cache:
+        print("\nReturning response from cache")
+        return cache[url]
+
+    parsed_url = url.replace("http://", "").replace("https://", "")
+
+    if "/" in parsed_url:
+        host, path = parsed_url.split("/", 1)
+    else:
+        host = parsed_url
+        path = ""
+
+    with socket.create_connection((host, 443)) as sock:
+        with ssl.create_default_context().wrap_socket(sock, server_hostname=host) as ssl_sock:
+            headers = {
+                "Host": host,
+                "Connection": "close",
+                "Accept": "application/json, text/html",
+            }
+            request = f"GET /{path} HTTP/1.1\r\n" + "\r\n".join([f"{k}: {v}" for k, v in headers.items()]) + "\r\n\r\n"
+            ssl_sock.send(request.encode())
+
+            response = b""
+            while True:
+                data = ssl_sock.recv(1024)
+                if not data:
+                    break
+                response += data
+
+            cache[url] = response
+            return response
+
+
+def make_request(url):
+    if "www.google" in url:
+        response = request(url.replace("www.", ""))
+    else:
+        response = request(url)
+
+    if "HTTP/1.1 30" in response.decode("utf-8"):
+        headers, body = response.split(b'\r\n\r\n', 1)
+        headers = headers.decode('utf-8')
+        location_header = [h for h in headers.split('\r\n') if h.startswith('Location:')]
+        if location_header:
+            location_url = location_header[0][len('Location:'):].strip()
+            response = request(location_url)
+            soup = BeautifulSoup(response[response.lower().find(b"<html"):], 'html.parser')
+            text = '\n'.join([s for s in soup.get_text().splitlines() if s])
+            print("\n" + text)
+
+    else:
+        if "application/json" in response.decode("utf-8"):
+                r = response.decode('utf-8')
+                headers, body = r.split('\r\n\r\n', 1)
+                res = BeautifulSoup(body, features="lxml")
+                text = '\n'.join([s for s in res.get_text().splitlines() if s])
+                print("\n" + text)
+        else:
+            soup = BeautifulSoup(response[response.lower().find(b"<html"):], 'html.parser')
+            text = '\n'.join([s for s in soup.get_text().splitlines() if s])
+            print("\n" + text)
+
+
+def search(search_term):
+    if len(search_term.split()) > 2:
+        url = f"https://www.google.com/search?q=" + "+".join(search_term.split()).replace("-s+", "") + "&start=1&num=11"
+    else:
+        url = f"https://www.google.com/search?q=".join(search_term.split()).replace("-s", "") + "&start=1&num=11"
+
+    response = request(url)
+    soup = BeautifulSoup(response[response.lower().find(b"<html"):], 'html.parser')
+
+    div = soup.find_all('div', {'class': 'Gx5Zad fP1Qef xpd EtOod pkphOe'})
+    count = 0
+    results = []
+    for count, r in enumerate(div, 1):
+        title = r.find("h3").text
+        url = r.find("a").get('href').split('/url?q=')[1].split('&')[0]
+        decoded_url = urllib.parse.unquote(url)
+        result = {"count": count, "title": title, "url": decoded_url}
+        results.append(result)
+
+    for r in results:
+        print(f"\n{r['count']}. {r['title']}\n{r['url']}")
+
+    return results
+
+def display_results(results):
+    choice = input("\nDo you want to access a search result? [y/n]: ")
+    if choice.lower() == "y":
+        try:
+            result_num = int(input("Choose a number: "))
+            if result_num < 1 or result_num > len(results):
+                print("\n\tInvalid choice.")
+                display_results(results)
+                return
+            result = results[result_num - 1]
+            make_request(result["url"])
+            display_results(results)
+        except ValueError:
+            print("Invalid choice.")
+            return
+
+
+def help():
+    print("\n\tAvailable commands:\n\n\
+            `go2web -u <URL>`           make an HTTP request to the specified URL and print the response\n\
+            `go2web -s <search-term>`   search for a term(s) using the Google search engine and print top 10 results\n\
+            `go2web -h`                 display the available commands and their functionality\n\
+            `q`                         exit the CLI")
+            
+
+class Command:
+    def execute(self, user_input):
+        pass
+
+
+class UrlCommand(Command):
+    def execute(self, user_input):
+        try:
+            url = user_input.split(" ")[2]
+            make_request(url)
+        except Exception as e:
+            print(f"Error: {e}")
+
+
+class SearchCommand(Command):
+    def execute(self, user_input):
+        try:
+            search_term = user_input.split(" ", 1)[1]
+            results = search(search_term)
+            display_results(results)
+        except Exception as e:
+            print(f"Error: {e}")
+
+
+class HelpCommand(Command):
+    def execute(self, user_input):
+        try:
+            help()
+        except Exception as e:
+            print(f"Error: {e}")
+
+
+class QuitCommand(Command):
+    def execute(self, user_input):
+        print("\n\tBye! See you soon!")
+        exit()
+
+
+COMMANDS = {
+    "-u": UrlCommand(),
+    "-s": SearchCommand(),
+    "-h": HelpCommand(),
+    "q": QuitCommand(),
+}
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='browser for toasters')
+    parser.add_argument('-u', required=False, help='make an HTTP request to the specified URL and print the response')
+    parser.add_argument('-s', required=False, help='search for a term using your favorite search engine and print top 10 results')
+
+    print("\n\tWelcome to the go2web CLI!\n\tTry `go2web -h` to see what I can do!")
+    while True:
+        user_input = input("\n>>> ")
+        tokens = user_input.split()
+        if len(tokens) == 0:
+            continue
+        elif len(tokens) > 1 and tokens[0] == "go2web":
+            tokens.pop(0)
+            cmd_str = tokens[0]
+            if cmd_str in COMMANDS:
+                cmd_obj = COMMANDS[cmd_str]
+                cmd_obj.execute(user_input)
+            else:
+                print("Invalid command. Type 'go2web -h' to see the available ones, or 'q' to exit.")
+        elif len(tokens) == 1 and tokens[0] == "q":
+            cmd_str = tokens[0]
+            cmd_obj = COMMANDS[cmd_str]
+            cmd_obj.execute(user_input)
+        else:
+            print("Invalid command. Type 'go2web -h' to see the available ones, or 'q' to exit.")
