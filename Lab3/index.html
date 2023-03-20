@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patricia Capitan FAF-201</title>
+    <link rel="icon" href="img/logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/css.gg/icons/all.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <div class="nav">
+        <div class="hamburger-menu">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="search">
+          <table>
+            <tr>
+              <td><input type="text" placeholder="Search tasks" class="search-bar"></td>
+              <td><i class="gg-search"></i></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="app-container">
+        <div class="side-container">
+          <h3><i class="gg-play-list-search"></i>TO-DO LISTS</h3>
+          <div class="todo-lists">
+            <ul todo-lists></ul>
+            <div class="list-buttons">
+              <button class="edit-button" edit-list-button>
+                <i class="gg-edit-markup"></i>
+              </button>
+              <button class="delete-button" delete-list-button>
+                <i class="gg-trash"></i>
+              </button>
+            </div>
+            <form new-list-form>
+              <input type="text" class="new-list" placeholder="Add a new To-Do list" new-list-input>
+              <i class="gg-enter"></i>
+            </form>
+          </div>
+        </div>
+        <div class="todos" list-display>
+          <div class="empty-list"></div>
+          <div class="todo-container">
+            <div class="todo-header">
+              <i class="gg-move-task"></i><h3 list-title></h3>
+              <p remaining-count><span></span></p>
+            </div>
+            <div class="todo-subheader">
+              <div class="buttons">
+                <button class="add-button">
+                  <i class="gg-math-plus"></i>
+                </button>
+                <div class="show">
+                  <button class="show-button" show-all-tasks-button>
+                    All
+                  </button>
+                  <button class="show-button" show-complete-tasks-button>
+                    Complete
+                  </button>
+                  <button class="show-button" show-incomplete-tasks-button>
+                    Incomplete
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="todo-list" tasks></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="new-task-form">
+        <div class="form-container">
+          <h2>NEW TASK</h2>
+          <div class="close">+</div>
+          <form new-task-form>
+            <label for="name">Name:</label><br>
+            <input type="text" class="name" placeholder="e.g. Complete the lab works" required new-task><br>
+            <label for="due-date">Due date:</label>
+            <input type="date" class="due-date" name="due-date"><br>
+            <label for="time-input">Due time:</label>
+            <input type="time" class="due-time" name="due-time"><br>
+            <label for="priority">Priority:</label><br>
+            <select name="priority" class="priority">
+              <option value="No priority">No priority</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select><br>
+            <label for="description">Description:</label><br>
+            <textarea name="description" class="description" rows="5"></textarea><br>
+            <input type="submit">
+          </form>
+        </div>
+      </div>
+
+      <div class="form-shadow"></div>
+
+      <template class="task-template">
+        <div class="todo">
+          <div class="todo-content">
+            <div class="task">
+              <input type="checkbox">
+              <label><span class="checkbox"></span></label>
+            </div>
+          </div>
+        </div>
+      </template>
+  </div>
+
+  <div class="background"></div>
+  </body>
+</html>

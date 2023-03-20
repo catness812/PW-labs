@@ -1,0 +1,524 @@
+@import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: Mochiy Pop P One, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+  }
+
+input::placeholder {
+    color: #fff;
+}
+
+.app {
+    background: #babada;
+    height: 100vh;
+}
+
+.background {
+    position: absolute;
+    background-image: url(img/background.png);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    background-size: cover;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.empty-list {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger-menu {
+    display: none;
+    cursor: pointer;
+}
+
+.hamburger-menu div {
+    background: #461f81;
+    width: 4vh;
+    height: 4px;
+    margin: 1vh 1vh 1vh 2vh;
+    border-radius: 5px;
+}
+
+.nav .search {
+    margin: 20px 0 40px 0;
+}
+
+.nav .gg-search {
+    color: #461f81;
+    right: 3vh;
+    z-index: 1;
+}
+
+.nav .search input {
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    font-size: .8em;
+    width: 35vw;
+    height: 35px;
+    border-radius: 10px;
+    background: #a299b0;
+}
+
+.app-container {
+    display: flex;
+}
+
+.side-container {
+    background: linear-gradient(135deg, rgba(95, 78, 120, 0.6), rgba(95, 78, 120, 0.4));
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .3);
+    border-radius: 30px;
+    border: 2px solid rgba(95, 78, 120, .3);
+    margin-left: 20px;
+    width: 22%;
+    height: 80vh;
+    color: #fff;
+    transition: 0.6s;
+    z-index: 1;
+    overflow-y: scroll;
+}
+
+.side-container h3 {
+    margin: 20px 10px 0 10px;
+    font-size: 1.6em;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.side-container .gg-play-list-search {
+    margin: 5px 0 10px 5px;
+    width: 30px;
+}
+
+.side-container .todo-lists {
+    padding: 1em;
+}
+
+.side-container .active-list {
+    font-weight: 700;
+    color: #2f1556;
+    background: rgba(255, 255, 255, .6);
+    border-radius: 20px;
+}
+
+.side-container .todo-lists li {
+    font-size: 14px;
+    margin-top: 10px;
+    list-style: none;
+    padding: 1em;
+    transition: 0.3s all ease-in-out;
+    cursor: pointer;
+}
+
+.side-container .todo-lists li:hover {
+    color: #2f1556;
+    background: rgba(255, 255, 255, .2);
+    border-radius: 20px;
+}
+
+.side-container .todo-lists form {
+    position: absolute;
+    bottom: 15px;
+    display: flex;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(95, 78, 120, 0.6);
+    padding: 7px 5px 7px 5px;
+    width: 65%;
+    outline: none;
+    border: none;
+    border-radius: 25px;
+}
+
+.side-container .todo-lists form input {
+    width: 100%;
+    margin-left: 10px;
+    outline: none;
+    border: none;
+    background: none;
+    color: #fff;
+}
+
+.side-container .todo-lists form .gg-enter {
+    margin-right: 10px;
+}
+
+.side-container .todo-lists .list-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5em auto;
+    width: 18vh;
+}
+
+.side-container .todo-lists .delete-button {
+    padding: 1em;
+    background: none;
+    outline: none;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    transform: scale(1.1);
+}
+
+.side-container .todo-lists .edit-button {
+    padding: 1em;
+    background: none;
+    outline: none;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    transform: scale(1.1);
+}
+
+.side-container .todo-lists .delete-button:hover {
+    background: rgba(95, 78, 120, 0.6);
+}
+
+.side-container .todo-lists .edit-button:hover {
+    background: rgba(95, 78, 120, 0.6);
+}
+
+.todos {
+    width: 70%;
+    margin: 0 auto;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .3);
+    border-radius: 30px;
+    overflow-y: scroll;
+}
+
+.todos .todo-header {
+    display: flex;
+    align-items: center;
+    padding: 2em;
+}
+
+.todos .todo-header h3 {
+    color: #fff;
+    margin-left: 20px;
+    font-size: 1.4em;
+    text-transform: uppercase;
+}
+
+.todos .todo-header .gg-move-task {
+    transform: scale(1.5);
+    color: #fff;
+}
+
+.todos .todo-header p {
+    font-size: .7em;
+    position: absolute;
+    right: 8%;
+    color: #fff;
+    background: rgba(55, 30, 91, .5);
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.todos .todo-subheader {
+    margin: 0 1em 0 1em;
+}
+  
+.todos .todo-subheader .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+  
+.todos .todo-subheader .add-button {
+    background: rgba(55, 30, 91, .6);
+    color: #fff;
+    border: none;
+    width: 3em;
+    height: 3em;
+    border-radius: 50px;
+    cursor: pointer;
+}
+  
+.todos .todo-subheader .add-button .gg-math-plus {
+    left: 50%;
+    transform: translateX(-50%);
+}
+  
+.todos .todo-subheader .show-button {
+    outline: none;
+    border: none;
+    background: none;
+    padding: 0.8rem 2.4rem;
+    border-radius: 2.5rem;
+    font-size: .6em;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.new-task-form {
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    z-index: 3;
+}
+  
+.form-container {
+    display: flex;
+    flex-direction: column;
+    background: rgba(218, 206, 235, .8);
+    border-radius: 1em;
+    padding: 1em;
+    transform: scale(0);
+    transition: 0.5s ease;
+}
+  
+.form-container h2 {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 2.1em;
+    color: #2f1556;
+}
+  
+.form-container .close {
+    position: absolute;
+    top: .2em;
+    right: .5em;
+    font-size: 2.6em;
+    cursor: pointer;
+    transform: rotate(45deg);
+    transition: 0.3s ease;
+    color: #2f1556;
+}
+  
+.form-container label {
+    font-size: 1.1em;
+    color: #2f1556;
+}
+  
+.form-container input[type="text"], select {
+    padding: .5em;
+    margin-bottom: .8em;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 0;
+    font-size: .9rem;
+    outline: none;
+    width: 100%;
+    background: rgba(70, 31, 129, .2);
+    color: #fff;
+}
+  
+.form-container input[type="date"] {
+    margin-top: 5px;
+    border-radius: 10px;
+    font-size: 1rem;
+    display: block;
+    border: none;
+    padding: .5em;
+    width: 100%;
+    background: rgba(70, 31, 129, .2);
+    color: #fff;
+    outline: none;
+}
+
+.form-container input[type="time"] {
+    margin-top: 5px;
+    border-radius: 10px;
+    font-size: 1rem;
+    display: block;
+    border: none;
+    padding: .5em;
+    width: 100%;
+    background: rgba(70, 31, 129, .2);
+    color: #fff;
+    outline: none;
+}
+  
+.form-container textarea {
+    margin-top: 5px;
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
+    border: none;
+    width: 100%;
+    background: rgba(70, 31, 129, .2);
+    color: #fff;
+}
+  
+.form-container input[type="submit"] {
+    margin-left: 50%;
+    transform: translateX(-50%);
+    padding: .8em;
+    margin-top: 1em;
+    border: 0;
+    border-radius: 20px;
+    outline: 0;
+    cursor: pointer;
+    font-size: .9rem;
+    border: 2px solid #2f1556;
+    color: #2f1556;
+    background: none;
+    transition: 0.3s ease;
+}
+  
+.form-container input[type="submit"]:hover {
+    background: #2f1556;
+    color: #fff;
+}
+  
+.form-shadow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.3s ease;
+    z-index: 2;
+}
+
+.todos .todo {
+    color: #2f1556;
+    margin: 1em;
+    border-radius: 0.5rem;
+    background: rgba(95, 78, 120, .3);
+}
+
+.todos .todo .todo-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.todos .todo .todo-content input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.todos .todo .todo-content label {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    margin: 1em 0 1em 0;
+    font-size: .8em;
+    cursor: pointer;
+}
+
+.todos .todo .todo-content label::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    left: 2.5em;
+    height: 100%;
+    background-image: linear-gradient(135deg, rgba(0, 0, 0, .5) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .5) 50%, rgba(0, 0, 0, .5) 75%, transparent 75%, transparent 100%);
+    background-size: 30px 30px;
+    transform: scale(0);
+}
+
+.todos .todo .todo-content .checkbox {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: 0.5em 1em;
+    cursor: pointer;
+    border-radius: 50%;
+    opacity: 1;
+}
+
+.todos .todo-content input:checked + label {
+    opacity: 0.6;
+}
+
+.todos .todo-content input:checked + label:after {
+    transform: scale(1);
+}
+
+.todos .todo-content input:checked + label .checkbox {
+    background: #2f1556;
+}
+
+.edit {
+    float: right;
+    padding: 2rem 5rem 2rem 0;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.delete {
+    float: right;
+    padding: 2rem 5rem 2rem 0;
+    transition: 0.3s ease;
+    cursor: pointer;
+    transform: scale(1.1);
+    margin-top: -5px;
+}
+
+@media screen and (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+
+  .side-container {
+    position: absolute;
+    left: -100%;
+  }
+
+  .side-container.active {
+    position: absolute;
+    left: -20px;
+    width: 100%;
+  }
+
+  .side-container form {
+    position: absolute;
+    width: 92%;
+    bottom: 12%;
+  }
+
+  .todos .todo-container {
+    height: 92vh;
+  }
+
+  .todos {
+    width: 90%;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1280px) {
+  .side-container {
+    width: 30%;
+  }
+
+  .todos {
+    width: 60%;
+  }
+}
