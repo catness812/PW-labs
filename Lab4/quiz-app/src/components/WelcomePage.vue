@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button @click="logOut">Log Out</button>
     <h1>Welcome, {{ firstName }} {{ lastName }}!</h1>
     <h3>Choose a quiz and let the game begin!</h3>
     <div v-if="quizzes.length">
@@ -30,6 +31,10 @@ export default {
     };
   },
   methods: {
+    logOut() {
+      this.$router.push("/");
+      sessionStorage.clear();
+    },
     async updateAccessToken() {
       try {
         const response = await axios.post(

@@ -1,9 +1,17 @@
 <template>
   <div>
+    <button @click="goBack">Back</button>
     <h1>{{ quizTitle }}</h1>
-    <p id="quiz-played-message"></p>
+    <div id="quiz-played-message">
+      <p>You have already completed this quiz!</p>
+      <p>Your score is {{ score }}/{{ questions.length }}.</p>
+      <p>
+        Total time: {{ Math.floor(time / 60) }}:{{ time % 60 < 10 ? "0" : ""
+        }}{{ time % 60 }}
+      </p>
+    </div>
     <div id="quiz-start" v-if="!started">
-      <button @click="startQuiz">Start Quiz</button>
+      <button @click="startQuiz" id="start-btn">Start Quiz</button>
     </div>
     <div v-else>
       <div v-if="currentQuestion !== null">
@@ -24,9 +32,14 @@
         </div>
       </div>
       <div v-else>
-        <p>You have completed the quiz!</p>
+        <p>Congrats! You have completed the quiz!</p>
         <p>Your score is {{ score }}/{{ questions.length }}.</p>
       </div>
+      <p>
+        Elapsed time: {{ Math.floor(timer / 60) }}:{{
+          timer % 60 < 10 ? "0" : ""
+        }}{{ timer % 60 }}
+      </p>
     </div>
   </div>
 </template>
@@ -44,11 +57,23 @@ export default {
       started: false,
       currentQuestion: null,
       answerSubmitted: null,
-      score: 0,
+      score: "loading",
+      timer: 0,
+      timerInterval: null,
+      time: 0,
       accessToken: secret.access,
     };
   },
   methods: {
+    goBack() {
+      const userId = sessionStorage.getItem("id");
+      this.$router.push({
+        name: "welcome",
+        params: {
+          id: userId,
+        },
+      });
+    },
     async updateAccessToken() {
       try {
         const response = await axios.post(
@@ -69,11 +94,29 @@ export default {
     },
     startQuiz() {
       this.started = true;
-      this.currentQuestion = this.questions[0];
-      window.addEventListener("beforeunload", this.showWarning);
-    },
-    showWarning(event) {
-      event.preventDefault();
+      const userId = sessionStorage.getItem("id");
+      const timerKey = `timer-${this.quizId}-${userId}`;
+      if (localStorage.getItem(timerKey) !== null) {
+        this.timer = parseInt(localStorage.getItem(timerKey));
+      } else {
+        this.timer = 0;
+        localStorage.setItem(timerKey, this.timer);
+      }
+      this.timerInterval = setInterval(() => {
+        this.timer++;
+        localStorage.setItem(
+          `timer-${this.quizId}-${sessionStorage.getItem("id")}`,
+          this.timer
+        );
+      }, 1000);
+      const unansweredQuestion = this.questions.find(
+        (question) => question.submitted_answer === null
+      );
+      if (unansweredQuestion) {
+        this.currentQuestion = unansweredQuestion;
+      } else {
+        this.currentQuestion = this.questions[0];
+      }
     },
     async submitAnswer(answer) {
       if (this.answerSubmitted !== null) {
@@ -101,9 +144,6 @@ export default {
         );
         const isCorrect = response.data.correct;
         this.answerSubmitted = isCorrect ? "correct" : "incorrect";
-        if (isCorrect) {
-          this.score++;
-        }
       } catch (error) {
         if (error.response.status === 401) {
           this.accessToken = await this.updateAccessToken();
@@ -120,6 +160,40 @@ export default {
         this.answerSubmitted = null;
       } else {
         this.currentQuestion = null;
+        clearInterval(this.timerInterval);
+        this.getScore().then((score) => {
+          this.score = score;
+        });
+      }
+    },
+    async getScore() {
+      const userId = sessionStorage.getItem("id");
+      try {
+        const response = await axios.get(
+          `https://late-glitter-4431.fly.dev/api/v54/quizzes/${this.quizId}`,
+          {
+            headers: {
+              "X-Access-Token": this.accessToken,
+            },
+            params: {
+              user_id: userId,
+            },
+          }
+        );
+        const quizData = response.data;
+        this.questions = quizData.questions;
+        const correctAnswers = quizData.questions.reduce((count, question) => {
+          return question.answered_correctly ? count + 1 : count;
+        }, 0);
+        return correctAnswers;
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.accessToken = await this.updateAccessToken();
+          return await this.getScore();
+        } else {
+          console.error(error);
+          return 0;
+        }
       }
     },
     async checkIfQuizPlayed() {
@@ -139,16 +213,29 @@ export default {
         const quizData = response.data;
         this.quizTitle = quizData.title;
         this.questions = quizData.questions;
-        const answeredQuestions = quizData.questions.filter(
-          (question) => question.submitted_answer !== null
+        const unansweredQuestions = quizData.questions.filter(
+          (question) => question.submitted_answer === null
         );
-        if (answeredQuestions.length > 0) {
-          const quizStart = document.getElementById("quiz-start");
-          const quizPlayedMessage = document.getElementById(
-            "quiz-played-message"
-          );
-          quizPlayedMessage.textContent = "This quiz has already been played.";
+        const quizStart = document.getElementById("quiz-start");
+        const quizPlayedMessage = document.getElementById(
+          "quiz-played-message"
+        );
+        if (unansweredQuestions.length === this.questions.length) {
+          quizStart.style.display = "block";
+          quizPlayedMessage.style.display = "none";
+        } else if (unansweredQuestions.length > 0) {
+          const startBtn = document.getElementById("start-btn");
+          startBtn.textContent = "Resume Quiz";
+          quizStart.style.display = "block";
+          quizPlayedMessage.style.display = "none";
+        } else {
           quizStart.style.display = "none";
+          clearInterval(this.timerInterval);
+          this.getScore().then((score) => {
+            this.score = score;
+          });
+          const timerKey = `timer-${this.quizId}-${userId}`;
+          this.time = localStorage.getItem(timerKey);
         }
       } catch (error) {
         if (error.response.status === 401) {

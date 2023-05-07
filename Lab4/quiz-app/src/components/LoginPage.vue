@@ -62,6 +62,12 @@ export default {
           },
         })
         .then((response) => {
+          const userIdRegex = /^[0-9]+$/;
+          const isValidUserId = userIdRegex.test(this.userId);
+          if (!isValidUserId) {
+            alert("User ID must be a numeric value");
+            return;
+          }
           const user = response.data.find(
             (user) =>
               user.name === this.firstName &&
