@@ -8,9 +8,9 @@
       </div>
     </div>
     <div class="footer">
-      <p>Press the music button for an experience even more magical.</p>
+      <p>Press the music button for an experience that's even more magical.</p>
       <button @click.prevent="toggleMusic" id="music-btn">
-        <img src="@/assets/music.png" />
+        <img src="@/assets/landing/music.png" />
       </button>
     </div>
   </div>
@@ -55,32 +55,20 @@ export default {
 </script>
 
 <style scoped>
-@font-face {
-  font-family: "HarryPotter";
-  src: url("@/assets/harry_potter/harryp-webfont.woff2") format("woff2"),
-    url("@/assets/harry_potter/harryp-webfont.woff2") format("woff");
-}
-
-* {
-  font-family: "HarryPotter", Arial, sans-serif;
-}
-
 .landing {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background: url("@/assets/background.gif") no-repeat center center fixed;
+  background: url("@/assets/landing/background.gif") no-repeat center center
+    fixed;
   background-size: cover;
 }
 
 .content {
   margin: 50px 17% 0 17%;
   padding: 5vw 6vw 4vw 6vw;
-  color: #d9d9d9;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 50px;
 }
 
 .content h1,
@@ -92,7 +80,9 @@ export default {
 }
 
 .content h1 {
+  color: #b68439;
   font-size: 7vw;
+  text-shadow: -3px 0 #372e29, 0 3px #372e29, 3px 0 #372e29, 0 -3px #372e29;
 }
 
 .btns button {
@@ -101,16 +91,16 @@ export default {
   border: none;
   padding: 10px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  transition: 0.2s ease-in-out;
-  border: 2px solid transparent;
+  color: #392c22;
+  background: rgba(255, 255, 255, .35);
+  transition: .2s ease-in-out;
   cursor: pointer;
 }
 
 .btns button:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border: 2px solid #d3d1d1;
-  color: #d3d1d1;
+  background: rgba(240, 199, 94, .8);
+  box-shadow: 0 0 5px rgba(240, 199, 94, .8), 0 0 25px rgba(240, 199, 94, .8),
+    0 0 50px rgba(240, 199, 94, .8), 0 0 200px rgba(240, 199, 94, .8);
 }
 
 .footer {
@@ -130,7 +120,7 @@ export default {
   background: none;
   border: none;
   cursor: pointer;
-  transition: 0.3s ease-in-out;
+  transition: .3s ease-in-out;
 }
 
 .footer #music-btn img {

@@ -1,46 +1,89 @@
 <template>
-  <div>
-    <button @click="goBack">Back</button>
+  <div class="quiz-page">
+    <button @click="goBack" id="back">
+      <img src="@/assets/quiz/back.png" />
+    </button>
     <h1>{{ quizTitle }}</h1>
-    <div id="quiz-played-message">
-      <p>You have already completed this quiz!</p>
-      <p>Your score is {{ score }}/{{ questions.length }}.</p>
-      <p>
-        Total time: {{ Math.floor(time / 60) }}:{{ time % 60 < 10 ? "0" : ""
-        }}{{ time % 60 }}
-      </p>
-    </div>
-    <div id="quiz-start" v-if="!started">
-      <button @click="startQuiz" id="start-btn">Start Quiz</button>
-    </div>
-    <div v-else>
-      <div v-if="currentQuestion !== null">
-        <h2>{{ currentQuestion.question }}</h2>
-        <ul>
-          <li
-            v-for="(answer, index) in currentQuestion.answers"
-            :key="index"
-            @click="submitAnswer(answer)"
+    <div class="content">
+      <div id="quiz-played-message">
+        <p>You have already completed this quiz!</p>
+        <p>
+          Your score is
+          <span id="score">{{ score }}/{{ questions.length }}</span>
+        </p>
+        <p>
+          Total time:
+          <span id="time"
+            >{{ Math.floor(time / 60) }}:{{ time % 60 < 10 ? "0" : ""
+            }}{{ time % 60 }}</span
           >
-            {{ answer }}
-          </li>
-        </ul>
-        <div v-if="answerSubmitted">
-          <p v-if="answerSubmitted === 'correct'">Correct!</p>
-          <p v-else>Incorrect!</p>
-          <button @click="nextQuestion">Next</button>
+        </p>
+      </div>
+      <div id="quiz-start" v-if="!started">
+        <button @click="startQuiz" id="start-btn">Start Quiz</button>
+      </div>
+      <div v-else id="questions">
+        <div v-if="currentQuestion !== null">
+          <h3>{{ currentQuestionNumber }} / {{ questions.length }}</h3>
+          <h2>{{ currentQuestion.question }}</h2>
+          <ul>
+            <li
+              v-for="(answer, index) in currentQuestion.answers"
+              :key="index"
+              @click="submitAnswer(answer)"
+            >
+              {{ answer }}
+            </li>
+          </ul>
+          <span class="elapsed"
+            ><p>
+              Elapsed time: {{ Math.floor(timer / 60) }}:{{
+                timer % 60 < 10 ? "0" : ""
+              }}{{ timer % 60 }}
+            </p></span
+          >
+          <div v-if="answerSubmitted" id="feedback">
+            <p v-if="answerSubmitted === 'correct'">Correct!</p>
+            <p v-else>Oh no, that's wrong!</p>
+            <button @click="nextQuestion">Next</button>
+          </div>
+        </div>
+        <div v-else id="finish">
+          <p>
+            Your score is
+            <span id="score">{{ score }}/{{ questions.length }}</span>
+          </p>
+          <p v-if="score / questions.length <= 0.4">
+            Uh oh... you better start revising!
+            <br />
+            <img src="@/assets/quiz/snape.gif" />
+          </p>
+          <p v-else-if="score / questions.length <= 0.7">
+            Well done, but could've been better!
+            <br />
+            <img src="@/assets/quiz/hermione.gif" />
+          </p>
+          <p v-else-if="score / questions.length > 0.7">
+            Great job! You're a prodigy!
+            <br />
+            <img src="@/assets/quiz/brilliant.gif" />
+          </p>
         </div>
       </div>
-      <div v-else>
-        <p>Congrats! You have completed the quiz!</p>
-        <p>Your score is {{ score }}/{{ questions.length }}.</p>
-      </div>
-      <p>
-        Elapsed time: {{ Math.floor(timer / 60) }}:{{
-          timer % 60 < 10 ? "0" : ""
-        }}{{ timer % 60 }}
-      </p>
     </div>
+    <svg>
+      <filter id="wavy">
+        <feTurbulence
+          x="0"
+          y="0"
+          id="turbulence"
+          baseFrequency="0.01"
+          numOctaves="5"
+          seed="2"
+        ></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="30" />
+      </filter>
+    </svg>
   </div>
 </template>
 
@@ -63,6 +106,15 @@ export default {
       time: 0,
       accessToken: secret.access,
     };
+  },
+  computed: {
+    currentQuestionNumber() {
+      if (this.currentQuestion !== null) {
+        return this.questions.indexOf(this.currentQuestion) + 1;
+      } else {
+        return 0;
+      }
+    },
   },
   methods: {
     goBack() {
@@ -294,3 +346,241 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.quiz-page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #0a0703;
+}
+
+.quiz-page .content {
+  position: absolute;
+  top: 53%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 80%;
+  background: url("@/assets/quiz/background.jpeg") no-repeat center center fixed;
+  background-size: cover;
+  border-radius: 20px;
+  box-shadow: 0 0 5px #35201c, 0 0 25px #35201c, 0 0 50px #35201c,
+    0 0 200px #35201c;
+}
+
+.quiz-page #back {
+  position: absolute;
+  border: none;
+  margin: 20px 0 0 30px;
+  padding: 10px 9px 6px 9px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .35);
+  transition: .2s ease-in-out;
+  cursor: pointer;
+}
+
+.quiz-page #back img {
+  width: 24px;
+}
+
+.quiz-page #back:hover {
+  background: rgba(240, 199, 94, .8);
+  box-shadow: 0 0 5px rgba(240, 199, 94, .8), 0 0 25px rgba(240, 199, 94, .8),
+    0 0 50px rgba(240, 199, 94, .8), 0 0 200px rgba(240, 199, 94, .8);
+}
+
+.quiz-page h1 {
+  margin-top: 25px;
+  text-align: center;
+  color: rgba(255, 255, 255, .7);
+  font-size: 3.5vw;
+  text-shadow: -3px 0 #35201c, 0 3px #35201c, 3px 0 #35201c, 0 -3px #35201c;
+}
+
+.quiz-page #quiz-played-message {
+  position: relative;
+  top: 45%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  width: fit-content;
+  padding: 40px;
+  border-radius: 200px;
+}
+
+#finish {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  padding: 40px;
+  border-radius: 200px;
+}
+
+.quiz-page #quiz-played-message:before {
+  position: absolute;
+  z-index: -1;
+  border-radius: 200px;
+  content: "";
+  display: block;
+  width: 110%;
+  height: 110%;
+  left: -30px;
+  top: -40px;
+  background: rgba(228, 189, 111, .3);
+  border: 10px solid rgba(159, 126, 77, .8);
+  filter: url(#wavy);
+  box-shadow: 0 0 2px rgba(240, 199, 94, .5), 0 0 25px rgba(240, 199, 94, 1),
+    0 0 10px rgba(240, 199, 94, .8), 0 0 100px rgba(240, 199, 94, .5);
+}
+
+.quiz-page #quiz-played-message p {
+  color: #fff;
+  font-size: 2.2vw;
+}
+
+#score,
+.quiz-page #quiz-played-message #time,
+#questions h3 {
+  color: #35201c;
+  background: rgba(255, 255, 255, .4);
+  padding: 5px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+#questions h3 {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.quiz-page #quiz-start button {
+  margin: 20% 0 0 50%;
+  transform: translateX(-50%);
+  font-size: 48px;
+  border: none;
+  padding: 10px 9px 6px 9px;
+  border-radius: 20px;
+  color: #372e29;
+  background: rgba(255, 255, 255, .35);
+  transition: .2s ease-in-out;
+  cursor: pointer;
+}
+
+.quiz-page #quiz-start button:hover {
+  background: rgba(240, 199, 94, .8);
+  box-shadow: 0 0 5px rgba(240, 199, 94, .8), 0 0 25px rgba(240, 199, 94, .8),
+    0 0 50px rgba(240, 199, 94, .8), 0 0 200px rgba(240, 199, 94, .8);
+}
+
+.quiz-page #questions {
+  position: relative;
+  color: #fff;
+  font-size: 2vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: fit-content;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#questions h2 {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  max-width: 70%;
+}
+
+#questions ul {
+  position: relative;
+  padding-left: 0;
+  max-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#questions li {
+  position: relative;
+  list-style: none;
+  font-size: 1.7vw;
+  margin: 50px 20px 50px 20px;
+  padding: 10px 20px 10px 20px;
+  transition: .2s ease-in-out;
+  width: fit-content;
+  text-align: center;
+}
+
+#questions li:before {
+  position: absolute;
+  z-index: -1;
+  border-radius: 200px;
+  content: "";
+  display: block;
+  width: 110%;
+  height: 110%;
+  left: -30px;
+  top: -15px;
+  background: rgba(228, 189, 111, .3);
+  border: 10px solid rgba(159, 126, 77, .8);
+  filter: url(#wavy);
+  box-shadow: 0 0 2px rgba(240, 199, 94, .5), 0 0 25px rgba(240, 199, 94, 1),
+    0 0 10px rgba(240, 199, 94, .8), 0 0 100px rgba(240, 199, 94, .5);
+}
+
+#questions li:hover {
+  transform: scale(1.1);
+}
+
+#feedback {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+#feedback p,
+#feedback button {
+  margin: 0 20px 0 20px;
+}
+
+#feedback button {
+  font-size: 24px;
+  border: none;
+  padding: 10px 9px 6px 9px;
+  border-radius: 20px;
+  color: #372e29;
+  background: rgba(255, 255, 255, .35);
+  transition: .2s ease-in-out;
+  cursor: pointer;
+}
+
+#feedback button:hover {
+  background: rgba(240, 199, 94, .8);
+  box-shadow: 0 0 5px rgba(240, 199, 94, .8), 0 0 25px rgba(240, 199, 94, .8),
+    0 0 50px rgba(240, 199, 94, .8), 0 0 200px rgba(240, 199, 94, .8);
+}
+
+.elapsed {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+</style>
