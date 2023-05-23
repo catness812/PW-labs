@@ -8,5 +8,4 @@ This repository contains the laboratory works for the Web Programming course.
 | [Lab 2](Lab2) | :white_check_mark:       |
 | [Lab 3](Lab3) | :white_check_mark:       |
 | [Lab 4](Lab4) | :white_check_mark:       |
-| Lab 5         | :on:                     |
-| Lab 6         | :soon:                   |
+| [Lab 5](Lab5) | :white_check_mark:       |
